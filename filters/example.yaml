@@ -1,0 +1,33 @@
+# This file contains a sample filter configuration
+# Please use this as a template/reference for creating your own filters
+# Don't forget to enable the filter by setting 'enabled' to 'true'
+name: "Example Filter"
+enabled: false
+
+# Any domains containing these keywords will be matched
+# Note: These will be matched as substrings, so "micro" will still match "microsoft"
+keywords:
+  - "example"
+  - "filter"
+
+# These terms will be checked against Jaro-Winkler similarity
+# If the similarity is above the threshold, the domain will be matched
+# The domain will be split up into words by separators (e.g. "-") and each word will be checked individually
+similarity:
+  - threshold: 0.8
+    terms:
+      - "example"
+      - "filter"
+  - threshold: 0.6
+    terms:
+      - "hello"
+      - "world"
+
+# This is a list of regex patterns that will be checked against the domain
+regex:
+  - "example[0-9]+"
+
+# This is a list of keywords that will automatically skip the domain for this filter
+# These will be matched as substrings, same as the 'keywords' field
+exclusions:
+  - "exomple"
