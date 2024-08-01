@@ -1,14 +1,11 @@
-package main
+package filter
 
 import (
-	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/antzucaro/matchr"
 	"github.com/ari-kl/phish-stream/util"
-	"gopkg.in/yaml.v3"
 )
 
 // YAML configuration file
@@ -66,12 +63,20 @@ func (f Filter) FilterDomain(domain string) FilterResult {
 		}
 	}
 
+	// Break up the domain into parts before checking for similarity
+	// This is to prevent longer domains from bypassing short terms
+	parts := strings.FieldsFunc(domain, func(r rune) bool {
+		return r == '.' || r == '-'
+	})
+
 	for _, similarity := range f.Similarity {
 		for _, term := range similarity.Terms {
-			distance := matchr.JaroWinkler(domain, term, true)
+			for _, part := range parts {
+				distance := matchr.JaroWinkler(part, term, true)
 
-			if distance >= similarity.Threshold {
-				return FilterResult{name: f.Name, matched: true, matchType: FilterMatchTypeSimilarity, matchedBy: term, similarityScore: distance}
+				if distance >= similarity.Threshold {
+					return FilterResult{name: f.Name, matched: true, matchType: FilterMatchTypeSimilarity, matchedBy: term, similarityScore: distance}
+				}
 			}
 		}
 	}
@@ -90,68 +95,4 @@ func (f Filter) FilterDomain(domain string) FilterResult {
 	}
 
 	return noMatch
-}
-
-func LoadFilters(filtersPath string) []Filter {
-	// Iterate over all files in the filters directory
-	files, err := os.ReadDir(filtersPath)
-
-	if err != nil {
-		util.Logger.Error(err.Error())
-		return []Filter{}
-	}
-
-	var filters []Filter
-
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-
-		extension := filepath.Ext(file.Name())
-
-		if extension != ".yaml" && extension != ".yml" {
-			continue
-		}
-
-		filter, err := readFilterFile(filepath.Join(filtersPath, file.Name()))
-
-		if err != nil {
-			util.Logger.Error(err.Error())
-			continue
-		}
-
-		filters = append(filters, filter)
-	}
-
-	return filterEnabledFilters(filters)
-}
-
-func readFilterFile(filePath string) (Filter, error) {
-	data, err := os.ReadFile(filePath)
-
-	if err != nil {
-		return Filter{}, err
-	}
-
-	filter := Filter{}
-	err = yaml.Unmarshal(data, &filter)
-
-	if err != nil {
-		return Filter{}, err
-	}
-
-	return filter, nil
-}
-
-func filterEnabledFilters(filters []Filter) []Filter {
-	var enabledFilters []Filter
-
-	for _, filter := range filters {
-		if filter.Enabled {
-			enabledFilters = append(enabledFilters, filter)
-		}
-	}
-
-	return enabledFilters
 }
