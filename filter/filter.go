@@ -72,7 +72,7 @@ func (f Filter) FilterDomain(domain string) FilterResult {
 	for _, similarity := range f.Similarity {
 		for _, term := range similarity.Terms {
 			for _, part := range parts {
-				distance := matchr.JaroWinkler(part, term, true)
+				distance := matchr.JaroWinkler(part, term, false)
 
 				if distance >= similarity.Threshold {
 					return FilterResult{name: f.Name, matched: true, matchType: FilterMatchTypeSimilarity, matchedBy: term, similarityScore: distance}

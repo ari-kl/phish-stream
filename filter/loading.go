@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/ari-kl/phish-stream/config"
+	"github.com/ari-kl/phish-stream/review"
 	"github.com/ari-kl/phish-stream/util"
 	"gopkg.in/yaml.v3"
 )
@@ -20,6 +21,7 @@ func RunFilters(domain string) {
 			// Just log the match for now
 			// TODO: further processing & review
 			util.Logger.Info("Match", "domain", domain, "filter", filter.Name, "matchType", result.matchType, "matchedBy", result.matchedBy, "similarityScore", result.similarityScore)
+			review.SendMessage(domain, result.name)
 		}
 	}
 }

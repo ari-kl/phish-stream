@@ -13,6 +13,7 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jmoiron/jsonq v0.0.0-20150511023944-e874b168d07e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/slack-go/slack v0.13.1 // indirect
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 )
