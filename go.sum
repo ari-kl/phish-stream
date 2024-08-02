@@ -2,6 +2,8 @@ cloud.google.com/go/compute/metadata v0.2.0/go.mod h1:zFmK7XCadkQkj6TtorcaGlCW1h
 github.com/CaliDog/certstream-go v0.0.0-20200713031452-eca7997412f1 h1:P2kAob5k67YLNGJg0C6Wg0nTLrUpIxYvpPFVrk1y1PQ=
 github.com/CaliDog/certstream-go v0.0.0-20200713031452-eca7997412f1/go.mod h1:JBo69gi8JyPpZoLZgmZeXiq4o7Ib2qf2RiIxiWC0oYQ=
 github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8/go.mod h1:I0gYDMZ6Z5GRU7l58bNFSkPTFN6Yl12dsUlAZ8xy98g=
+github.com/ammario/ipisp/v2 v2.0.1 h1:54qm0Dwz0OjSa7ynqijgAieN6skjVeL8/2m78HP8Stc=
+github.com/ammario/ipisp/v2 v2.0.1/go.mod h1:bQ6KAL5LnYYEj6olUn+Bzv/im/4Esa5oGkbv9b+uOjo=
 github.com/antzucaro/matchr v0.0.0-20221106193745-7bed6ef61ef9 h1:bdN23nM++VfIw4oCAxyEmUdfwKgMFcHMVu4a7T6CNOQ=
 github.com/antzucaro/matchr v0.0.0-20221106193745-7bed6ef61ef9/go.mod h1:v3ZDlfVAL1OrkKHbGSFFK60k0/7hruHPDq2XMs9Gu6U=
 github.com/bwesterb/go-ristretto v1.2.0/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=

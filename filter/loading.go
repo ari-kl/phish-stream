@@ -17,11 +17,11 @@ func RunFilters(domain string) {
 
 	for _, filter := range filters {
 		result := filter.FilterDomain(stripped_domain)
-		if result.matched {
+		if result.Matched {
 			// Just log the match for now
 			// TODO: further processing & review
-			util.Logger.Info("Match", "domain", domain, "filter", filter.Name, "matchType", result.matchType, "matchedBy", result.matchedBy, "similarityScore", result.similarityScore)
-			review.SendMessage(domain, result.name)
+			util.Logger.Info("Match", "domain", domain, "filter", filter.Name, "matchType", result.MatchType, "matchedBy", result.MatchedBy, "similarityScore", result.SimilarityScore)
+			review.SendMessage(domain, result)
 		}
 	}
 }

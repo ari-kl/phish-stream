@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/antzucaro/matchr"
+	"github.com/ari-kl/phish-stream/shared"
 	"github.com/ari-kl/phish-stream/util"
 )
 
@@ -23,30 +24,10 @@ type FilterSimilarity struct {
 	Terms     []string `yaml:"terms"`
 }
 
-// Domain filtering result data
-type FilterMatchType int
-
-const (
-	FilterMatchTypeKeyword FilterMatchType = iota
-	FilterMatchTypeSimilarity
-	FilterMatchTypeRegex
-	FilterMatchTypeNone
-)
-
-type FilterResult struct {
-	name      string
-	matched   bool
-	matchType FilterMatchType
-	// The keyword, regex, or similarity term that matched the domain
-	matchedBy string
-	// similarityScore is only used when matchType is FilterMatchTypeSimilarity
-	similarityScore float64
-}
-
 // Empty non-matching result, here for reusability
-var noMatch = FilterResult{matched: false, matchType: FilterMatchTypeNone, matchedBy: "", similarityScore: 0}
+var noMatch = shared.FilterResult{Matched: false, MatchType: shared.FilterMatchTypeNone, MatchedBy: "", SimilarityScore: 0}
 
-func (f Filter) FilterDomain(domain string) FilterResult {
+func (f Filter) FilterDomain(domain string) shared.FilterResult {
 	if !f.Enabled {
 		return noMatch
 	}
@@ -59,7 +40,7 @@ func (f Filter) FilterDomain(domain string) FilterResult {
 
 	for _, keyword := range f.Keywords {
 		if strings.Contains(domain, keyword) {
-			return FilterResult{name: f.Name, matched: true, matchType: FilterMatchTypeKeyword, matchedBy: keyword}
+			return shared.FilterResult{Name: f.Name, Matched: true, MatchType: shared.FilterMatchTypeKeyword, MatchedBy: keyword}
 		}
 	}
 
@@ -75,7 +56,7 @@ func (f Filter) FilterDomain(domain string) FilterResult {
 				distance := matchr.JaroWinkler(part, term, false)
 
 				if distance >= similarity.Threshold {
-					return FilterResult{name: f.Name, matched: true, matchType: FilterMatchTypeSimilarity, matchedBy: term, similarityScore: distance}
+					return shared.FilterResult{Name: f.Name, Matched: true, MatchType: shared.FilterMatchTypeSimilarity, MatchedBy: term, SimilarityScore: distance}
 				}
 			}
 		}
@@ -90,7 +71,7 @@ func (f Filter) FilterDomain(domain string) FilterResult {
 		}
 
 		if match {
-			return FilterResult{name: f.Name, matched: true, matchType: FilterMatchTypeRegex, matchedBy: pattern}
+			return shared.FilterResult{Name: f.Name, Matched: true, MatchType: shared.FilterMatchTypeRegex, MatchedBy: pattern}
 		}
 	}
 
