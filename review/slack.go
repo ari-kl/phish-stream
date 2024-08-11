@@ -40,9 +40,16 @@ func StartSlackBot() {
 				case slack.InteractionTypeBlockActions:
 					for _, action := range callback.ActionCallback.BlockActions {
 						switch action.ActionID {
-						case "confirm-domain":
+						case "classify-domain":
+
+							data := strings.Split(action.SelectedOption.Value, ":")
+
+							domain := data[0]
+							classification := data[1]
+
 							// TODO: Send to takedown services
-							ConfirmMessage(callback.Channel.ID, callback.Container.MessageTs, action.Value)
+
+							ClassifyMessage(callback.Channel.ID, callback.Container.MessageTs, domain, classification)
 						case "dismiss-domain":
 							// All we need to do is dismiss the message, no further action required for dismissed domains
 							DismissMessage(callback.Channel.ID, callback.Container.MessageTs, action.Value)
@@ -79,7 +86,7 @@ func SendMessage(domain string, result shared.FilterResult) {
 		hostText = fmt.Sprintf("Host: %s (:flag-%s:)", isp, strings.ToLower(country))
 	}
 
-	client.SendMessage(
+	_, _, _, err = client.SendMessage(
 		os.Getenv("SLACK_CHANNEL_ID"),
 		slack.MsgOptionBlocks(
 			slack.NewRichTextBlock("",
@@ -90,11 +97,20 @@ func SendMessage(domain string, result shared.FilterResult) {
 			slack.NewContextBlock("", slack.NewTextBlockObject("mrkdwn", fmt.Sprintf("Filter: \"%s\"\t%s", result.Name, matchText), false, false)),
 			slack.NewContextBlock("", slack.NewTextBlockObject("mrkdwn", hostText, false, false)),
 			slack.NewActionBlock("",
-				slack.NewButtonBlockElement("confirm-domain", domain, slack.NewTextBlockObject("plain_text", "Confirm", false, false)).WithStyle(slack.StyleDanger),
+				slack.NewOptionsSelectBlockElement("static_select", slack.NewTextBlockObject("plain_text", "Select an item", true, false), "classify-domain",
+					slack.NewOptionBlockObject(GenerateClassificationText(domain, "postal"), slack.NewTextBlockObject("plain_text", "Postal", true, false), nil),
+					slack.NewOptionBlockObject(GenerateClassificationText(domain, "banking"), slack.NewTextBlockObject("plain_text", "Banking", true, false), nil),
+					slack.NewOptionBlockObject(GenerateClassificationText(domain, "item_scams"), slack.NewTextBlockObject("plain_text", "Item Scams", true, false), nil),
+					slack.NewOptionBlockObject(GenerateClassificationText(domain, "other"), slack.NewTextBlockObject("plain_text", "Other", true, false), nil),
+				),
 				slack.NewButtonBlockElement("dismiss-domain", domain, slack.NewTextBlockObject("plain_text", "Dismiss", false, false)),
 			),
 		),
 	)
+
+	if err != nil {
+		util.Logger.Error("Failed to send message to Slack", "err", err.Error())
+	}
 }
 
 func DismissMessage(channelID string, timestamp string, domain string) {
@@ -113,18 +129,22 @@ func DismissMessage(channelID string, timestamp string, domain string) {
 	)
 }
 
-func ConfirmMessage(channelID string, timestamp string, domain string) {
+func ClassifyMessage(channelID string, timestamp string, domain string, classification string) {
 	client.SendMessage(channelID,
 		slack.MsgOptionUpdate(timestamp),
 		slack.MsgOptionBlocks(
 			slack.NewRichTextBlock("",
 				slack.NewRichTextSection(
 					slack.NewRichTextSectionTextElement(
-						fmt.Sprintf("%s - confirmed", domain),
+						fmt.Sprintf("%s - confirmed (%s)", domain, classification),
 						&slack.RichTextSectionTextStyle{Italic: true},
 					),
 				),
 			),
 		),
 	)
+}
+
+func GenerateClassificationText(domain string, classification string) string {
+	return fmt.Sprintf("%s:%s", domain, classification)
 }

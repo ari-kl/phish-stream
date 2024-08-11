@@ -22,5 +22,5 @@ go.work
 go.work.sum
 
 # Phish stream filters
-filters/*.{yaml,yml}
+filters/*
 !filters/example.yaml
