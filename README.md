@@ -8,6 +8,7 @@ The following environment variables are required to be set in order to run the p
 - `SLACK_APP_TOKEN`: The token for the slack app (starts with `xapp-`)
 - `SLACK_BOT_TOKEN`: The token for the slack bot (starts with `xoxb-`) — socket mode must be enabled
 - `SLACK_CHANNEL_ID`: The slack channel ID to send messages to
+- `PHISH_OBSERVER_API_KEY`: The API key for the [Phish Observer](https://phish.observer) API
 
 See `.env.example` for a template.
 
